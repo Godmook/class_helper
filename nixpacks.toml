@@ -10,7 +10,7 @@ cmds = [
 [phases.build]
 cmds = [
     "npm run build --prefix frontend",
-    "playwright install chromium --prefix backend"
+    "cd backend && playwright install chromium"
 ]
 
 [start]
