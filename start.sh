@@ -1,49 +1,51 @@
 #!/bin/bash
 
-echo "🚀 Starting USC Class Helper..."
-echo "Current directory: $(pwd)"
+echo "========================================="
+echo "🚀 USC Class Helper - Starting..."
+echo "========================================="
+echo "Current dir: $(pwd)"
 echo "PORT: ${PORT:-8000}"
+echo ""
 
-# 프론트엔드가 이미 빌드되었는지 확인
-if [ ! -d "frontend/dist" ]; then
-    echo "📦 Building frontend..."
-    npm install --prefix frontend || true
-    npm run build --prefix frontend || true
+# 프론트엔드 확인
+if [ -d "frontend/dist" ]; then
+    echo "✅ Frontend built"
 else
-    echo "✅ Frontend already built"
+    echo "⚠️ Frontend not built, skipping..."
 fi
 
-# 백엔드 실행 (프론트엔드 빌드 파일 포함)
-echo "🐍 Starting backend..."
-cd backend || exit 1
-echo "Backend directory: $(pwd)"
+# 백엔드 디렉토리로 이동
+cd backend || { echo "❌ Backend directory not found!"; exit 1; }
+echo "✅ Changed to backend directory"
 
-# 가상환경 활성화
+# 가상환경 확인 및 활성화
 if [ -f "/app/venv/bin/activate" ]; then
-    echo "✅ Activating virtual environment..."
     source /app/venv/bin/activate
-    export PATH="/app/venv/bin:$PATH"
+    echo "✅ Virtual environment activated"
+    PYTHON_CMD="python3"
+    UVICORN_CMD="/app/venv/bin/uvicorn"
 else
-    echo "⚠️ Warning: Virtual environment not found at /app/venv"
+    echo "⚠️ Virtual env not found, using system Python"
+    PYTHON_CMD="python3"
+    UVICORN_CMD="python3 -m uvicorn"
 fi
 
-# Python 경로 확인
-echo "Python: $(which python3 || which python)"
-echo "Uvicorn: $(which uvicorn || echo 'not found')"
+# uvicorn 경로 확인
+if command -v uvicorn >/dev/null 2>&1; then
+    echo "✅ uvicorn found: $(which uvicorn)"
+    UVICORN_CMD="uvicorn"
+elif [ -f "/app/venv/bin/uvicorn" ]; then
+    echo "✅ uvicorn found: /app/venv/bin/uvicorn"
+    UVICORN_CMD="/app/venv/bin/uvicorn"
+else
+    echo "⚠️ uvicorn not in PATH, using python3 -m"
+    UVICORN_CMD="python3 -m uvicorn"
+fi
 
-# 환경 변수 확인
-echo "DATABASE_URL: ${DATABASE_URL:0:30}..."
-echo "SMTP_USER: ${SMTP_USER:-not set}"
+echo ""
+echo "Starting server..."
+echo "Command: $UVICORN_CMD app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+echo ""
 
-# 포트 설정
-PORT="${PORT:-8000}"
-echo "Starting uvicorn on port $PORT..."
-
-# 서버 시작 (에러가 발생해도 로그 출력)
-python3 -m uvicorn app.main:app --host 0.0.0.0 --port "$PORT" --log-level info || {
-    echo "❌ Uvicorn failed, trying alternative..."
-    /app/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port "$PORT" --log-level info || {
-        echo "❌ All attempts failed"
-        exit 1
-    }
-}
+# 서버 시작
+$UVICORN_CMD app.main:app --host 0.0.0.0 --port "${PORT:-8000}" --log-level info
