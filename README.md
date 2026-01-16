@@ -75,6 +75,8 @@ uvicorn app.main:app --reload
 4. 환경 변수 설정 (Railway 대시보드에서)
 5. 배포 자동 시작
 
+**자세한 Railway 설정 가이드는 [RAILWAY_SETUP.md](RAILWAY_SETUP.md)를 참고하세요.**
+
 ## 사용 방법
 
 1. 웹사이트에서 수업 번호와 이메일 입력
