@@ -51,12 +51,19 @@ Railway에서 자동으로 백엔드, 프론트엔드, 데이터베이스를 배
 
 ### 3. 백엔드 서비스 추가
 
-1. GitHub 저장소 → **backend/** 디렉토리 선택
-2. 또는 Railway에서 **"+ New"** → **"GitHub Repo"** → `backend` 디렉토리 선택
+1. Railway 프로젝트 → **"+ New"** → **"GitHub Repo"**
+2. `Godmook/class_helper` 저장소 선택
+3. ⚠️ **중요**: **"Root Directory"**를 `backend`로 설정
+4. Railway가 자동으로 Python 프로젝트를 인식합니다
 
 ### 4. 프론트엔드 서비스 추가
 
-1. Railway에서 **"+ New"** → **"GitHub Repo"** → `frontend` 디렉토리 선택
+1. Railway 프로젝트 → **"+ New"** → **"GitHub Repo"**
+2. `Godmook/class_helper` 저장소 선택
+3. ⚠️ **중요**: **"Root Directory"**를 `frontend`로 설정
+4. Railway가 자동으로 Node.js 프로젝트를 인식합니다
+
+> 📖 **자세한 배포 가이드는 [RAILWAY_DEPLOY.md](RAILWAY_DEPLOY.md)를 참고하세요.**
 
 ### 5. 환경 변수 설정
 

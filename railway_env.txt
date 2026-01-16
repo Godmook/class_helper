@@ -1,0 +1,11 @@
+# Railway 환경 변수 설정 가이드
+# 백엔드 서비스의 Variables 탭에 아래 값들을 추가하세요
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=cryptoboardtest@gmail.com
+SMTP_PASSWORD=!Qwer1234!
+FROM_EMAIL=cryptoboardtest@gmail.com
+TERM_URL=https://classes.usc.edu/term/20261/catalogue/program/CSCI/school/ENGV
+
+# 참고: DATABASE_URL은 PostgreSQL 플러그인 추가 시 자동 설정됩니다.
