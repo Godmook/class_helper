@@ -42,23 +42,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 프론트엔드 빌드 파일 서빙
+# 프론트엔드 빌드 파일 경로 설정
 frontend_dist = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "frontend", "dist")
 if os.path.exists(frontend_dist):
     # 정적 파일 (JS, CSS 등) 서빙
     app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
-    
-    # React 앱의 index.html 서빙 (API 경로가 아닌 모든 경로)
-    @app.get("/{full_path:path}")
-    async def serve_frontend(full_path: str):
-        if full_path.startswith("api"):
-            # API 경로는 아래 엔드포인트에서 처리
-            raise HTTPException(status_code=404)
-        # index.html 반환 (React Router가 처리)
-        index_path = os.path.join(frontend_dist, "index.html")
-        if os.path.exists(index_path):
-            return FileResponse(index_path)
-        raise HTTPException(status_code=404)
 
 
 # Pydantic 모델
@@ -169,6 +157,21 @@ async def get_course_logs(course_id: int, db: Session = Depends(get_db)):
     ).order_by(CrawlerLog.crawled_at.desc()).limit(50).all()
     
     return [LogResponse.model_validate(log) for log in logs]
+
+
+# 프론트엔드 서빙 (모든 API 경로 이후에 정의 - catch-all)
+if os.path.exists(frontend_dist):
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        # API 경로는 이미 위에서 처리됨
+        if full_path.startswith("api"):
+            raise HTTPException(status_code=404, detail="API endpoint not found")
+        
+        # index.html 반환 (React Router가 클라이언트 사이드 라우팅 처리)
+        index_path = os.path.join(frontend_dist, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        raise HTTPException(status_code=404)
 
 
 if __name__ == "__main__":
