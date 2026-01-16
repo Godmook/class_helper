@@ -3,14 +3,14 @@ nixPkgs = ["python311", "nodejs-18_x"]
 
 [phases.install]
 cmds = [
-    "cd frontend && npm install",
-    "cd ../backend && pip install -r requirements.txt"
+    "npm install --prefix frontend",
+    "pip install -r backend/requirements.txt"
 ]
 
 [phases.build]
 cmds = [
-    "cd frontend && npm run build",
-    "cd ../backend && playwright install chromium"
+    "npm run build --prefix frontend",
+    "playwright install chromium --prefix backend"
 ]
 
 [start]
