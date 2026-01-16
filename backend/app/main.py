@@ -1,7 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
@@ -31,12 +29,16 @@ async def lifespan(app: FastAPI):
     await scheduler.cleanup()
 
 
-app = FastAPI(title="USC 수업 크롤러", lifespan=lifespan)
+app = FastAPI(title="USC 수업 크롤러 API", lifespan=lifespan)
 
-# 정적 파일 및 템플릿
-if os.path.exists("static"):
-    app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+# CORS 설정 - 프론트엔드와 통신을 위해
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 프로덕션에서는 특정 도메인만 허용
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Pydantic 모델
@@ -68,10 +70,16 @@ class LogResponse(BaseModel):
 
 
 # API 엔드포인트
-@app.get("/", response_class=HTMLResponse)
-async def root(request: Request):
-    """메인 페이지"""
-    return templates.TemplateResponse("index.html", {"request": request})
+@app.get("/")
+async def root():
+    """API 루트"""
+    return {"message": "USC 수업 크롤러 API", "status": "running"}
+
+
+@app.get("/api/health")
+async def health():
+    """헬스 체크"""
+    return {"status": "healthy"}
 
 
 @app.post("/api/courses")
