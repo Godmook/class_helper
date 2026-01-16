@@ -15,7 +15,7 @@ cmds = [
 [phases.build]
 cmds = [
     "npm run build --prefix frontend",
-    "cd backend && playwright install chromium"
+    "source /app/venv/bin/activate && cd backend && playwright install chromium"
 ]
 
 [start]
