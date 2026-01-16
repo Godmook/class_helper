@@ -78,6 +78,11 @@ class LogResponse(BaseModel):
 
 
 # API 엔드포인트
+@app.get("/")
+async def root():
+    """루트 경로 - 헬스체크용"""
+    return {"message": "USC 수업 크롤러", "status": "running", "api": "/api"}
+
 @app.get("/api")
 async def api_root():
     """API 루트"""
@@ -160,9 +165,14 @@ async def get_course_logs(course_id: int, db: Session = Depends(get_db)):
 
 
 # 프론트엔드 서빙 (모든 API 경로 이후에 정의 - catch-all)
+# 단, 루트 경로("/")는 이미 위에서 정의했으므로 제외
 if os.path.exists(frontend_dist):
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str):
+        # 루트 경로는 이미 처리됨
+        if full_path == "" or full_path == "/":
+            raise HTTPException(status_code=404)
+        
         # API 경로는 이미 위에서 처리됨
         if full_path.startswith("api"):
             raise HTTPException(status_code=404, detail="API endpoint not found")
