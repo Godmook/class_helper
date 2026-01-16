@@ -36,4 +36,6 @@ echo "DATABASE_URL: ${DATABASE_URL:0:20}..."
 echo "SMTP_USER: ${SMTP_USER}"
 
 echo "Starting uvicorn on port $PORT..."
-uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+
+# 에러가 발생해도 로그를 확인할 수 있도록
+exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --log-level info 2>&1

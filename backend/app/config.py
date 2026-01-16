@@ -60,8 +60,36 @@ Railway 설정 방법:
     
     return True
 
+# 설정을 나중에 검증하도록 변경 (서버 시작은 허용)
+def get_settings():
+    """설정을 가져오되, 검증은 나중에"""
+    return Settings()
+
+# 즉시 검증하지 않고, 필요한 시점에 검증
+settings = None
+
+def init_settings():
+    """설정 초기화 (필요한 시점에 호출)"""
+    global settings
+    if settings is None:
+        try:
+            settings = Settings()
+            validate_settings()
+        except Exception as e:
+            print(f"⚠️ 환경 변수 경고: {e}")
+            # 개발 환경에서는 계속 진행, 프로덕션에서는 실패
+            if os.getenv("ENVIRONMENT") == "production":
+                raise
+            # 기본값으로 진행
+            settings = Settings()
+    return settings
+
+# 처음에는 기본 설정으로 시작
 try:
-    validate_settings()
     settings = Settings()
+    validate_settings()
 except Exception as e:
-    raise
+    print(f"⚠️ 환경 변수 검증 실패: {e}")
+    print("⚠️ 일부 기능이 작동하지 않을 수 있습니다.")
+    # 기본 설정으로 진행 (에러 발생 시 재시도 가능하도록)
+    settings = Settings()

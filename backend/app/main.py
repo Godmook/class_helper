@@ -23,12 +23,24 @@ scheduler: Optional[CrawlerScheduler] = None
 async def lifespan(app: FastAPI):
     # 시작 시
     global scheduler
-    scheduler = CrawlerScheduler()
-    await scheduler.init_crawler()
-    scheduler.start()
+    try:
+        scheduler = CrawlerScheduler()
+        await scheduler.init_crawler()
+        scheduler.start()
+        print("✅ Scheduler started successfully")
+    except Exception as e:
+        print(f"⚠️ Scheduler initialization failed: {e}")
+        print("⚠️ Continuing without scheduler (some features may not work)")
+        scheduler = None
+    
     yield
+    
     # 종료 시
-    await scheduler.cleanup()
+    if scheduler:
+        try:
+            await scheduler.cleanup()
+        except Exception as e:
+            print(f"⚠️ Scheduler cleanup error: {e}")
 
 
 app = FastAPI(title="USC 수업 크롤러", lifespan=lifespan)
