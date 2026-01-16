@@ -1,0 +1,6 @@
+frontend/
+README.md
+*.md
+*.sh
+.env.example
+railway_env.txt
