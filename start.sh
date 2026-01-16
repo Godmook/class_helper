@@ -16,7 +16,7 @@ fi
 echo "🐍 Starting backend..."
 cd backend
 
-# Python 경로에 user site-packages 추가
-export PYTHONPATH="${HOME}/.local/lib/python3.11/site-packages:${PYTHONPATH}"
+# 가상환경 활성화
+source /app/venv/bin/activate
 
 uvicorn app.main:app --host 0.0.0.0 --port $PORT
