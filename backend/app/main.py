@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
@@ -29,16 +31,34 @@ async def lifespan(app: FastAPI):
     await scheduler.cleanup()
 
 
-app = FastAPI(title="USC 수업 크롤러 API", lifespan=lifespan)
+app = FastAPI(title="USC 수업 크롤러", lifespan=lifespan)
 
 # CORS 설정 - 프론트엔드와 통신을 위해
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 프로덕션에서는 특정 도메인만 허용
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 프론트엔드 빌드 파일 서빙
+frontend_dist = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "frontend", "dist")
+if os.path.exists(frontend_dist):
+    # 정적 파일 (JS, CSS 등) 서빙
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+    
+    # React 앱의 index.html 서빙 (API 경로가 아닌 모든 경로)
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        if full_path.startswith("api"):
+            # API 경로는 아래 엔드포인트에서 처리
+            raise HTTPException(status_code=404)
+        # index.html 반환 (React Router가 처리)
+        index_path = os.path.join(frontend_dist, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        raise HTTPException(status_code=404)
 
 
 # Pydantic 모델
@@ -70,8 +90,8 @@ class LogResponse(BaseModel):
 
 
 # API 엔드포인트
-@app.get("/")
-async def root():
+@app.get("/api")
+async def api_root():
     """API 루트"""
     return {"message": "USC 수업 크롤러 API", "status": "running"}
 

@@ -32,9 +32,9 @@ usc_class_helper/
 └── README.md
 ```
 
-## 🚀 Railway 배포
+## 🚀 Railway 배포 (하나의 서비스)
 
-Railway에서 자동으로 백엔드, 프론트엔드, 데이터베이스를 배포합니다.
+하나의 Railway 서비스에서 프론트엔드와 백엔드를 함께 배포합니다!
 
 ### 1. Railway 프로젝트 생성
 
@@ -42,6 +42,7 @@ Railway에서 자동으로 백엔드, 프론트엔드, 데이터베이스를 배
 2. "New Project" 클릭
 3. "Deploy from GitHub repo" 선택
 4. `Godmook/class_helper` 저장소 선택
+5. ✅ **Root Directory는 설정하지 않음** (루트 디렉토리 사용)
 
 ### 2. PostgreSQL 데이터베이스 추가
 
@@ -49,43 +50,27 @@ Railway에서 자동으로 백엔드, 프론트엔드, 데이터베이스를 배
 2. **"Database"** → **"Add PostgreSQL"** 선택
 3. PostgreSQL 추가 시 **DATABASE_URL이 자동으로 설정됩니다** ✨
 
-### 3. 백엔드 서비스 추가
+### 3. 환경 변수 설정
 
-1. Railway 프로젝트 → **"+ New"** → **"GitHub Repo"**
-2. `Godmook/class_helper` 저장소 선택
-3. ⚠️ **중요**: **"Root Directory"**를 `backend`로 설정
-4. Railway가 자동으로 Python 프로젝트를 인식합니다
-
-### 4. 프론트엔드 서비스 추가
-
-1. Railway 프로젝트 → **"+ New"** → **"GitHub Repo"**
-2. `Godmook/class_helper` 저장소 선택
-3. ⚠️ **중요**: **"Root Directory"**를 `frontend`로 설정
-4. Railway가 자동으로 Node.js 프로젝트를 인식합니다
-
-> 📖 **자세한 배포 가이드는 [RAILWAY_DEPLOY.md](RAILWAY_DEPLOY.md)를 참고하세요.**
-
-### 5. 환경 변수 설정
-
-**백엔드 서비스**의 Variables 탭에서:
+프로젝트의 **Variables** 탭에서:
 
 ```
-SMTP_USER=your_email@gmail.com
-SMTP_PASSWORD=your_app_password
-FROM_EMAIL=your_email@gmail.com
+SMTP_USER=cryptoboardtest@gmail.com
+SMTP_PASSWORD=!Qwer1234!
+FROM_EMAIL=cryptoboardtest@gmail.com
+TERM_URL=https://classes.usc.edu/term/20261/catalogue/program/CSCI/school/ENGV
 ```
 
 > 💡 **DATABASE_URL**은 PostgreSQL 플러그인 추가 시 자동으로 설정됩니다!
 
-### 6. 프론트엔드 환경 변수 (선택사항)
+### 4. 배포 완료
 
-프론트엔드 서비스의 Variables 탭에서:
+Railway가 자동으로:
+1. 프론트엔드를 빌드
+2. 백엔드와 함께 하나의 서비스로 배포
+3. `/` 경로는 프론트엔드, `/api/*` 경로는 백엔드 API로 동작
 
-```
-VITE_API_URL=https://your-backend-url.railway.app
-```
-
-> 백엔드 URL은 Railway에서 생성된 백엔드 서비스의 도메인을 사용하세요.
+> 📖 **자세한 설정 가이드는 [ENV_SETUP.md](ENV_SETUP.md)를 참고하세요.**
 
 ## 📧 Gmail 앱 비밀번호 생성
 
