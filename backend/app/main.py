@@ -11,9 +11,15 @@ from app.models import User, Course, CrawlerLog
 from app.scheduler import CrawlerScheduler
 from contextlib import asynccontextmanager
 import os
+import sys
 
-# 데이터베이스 테이블 생성
-Base.metadata.create_all(bind=engine)
+# 데이터베이스 테이블 생성 (에러가 발생해도 계속 진행)
+try:
+    Base.metadata.create_all(bind=engine)
+    print("✅ Database tables created")
+except Exception as e:
+    print(f"⚠️ Database initialization warning: {e}")
+    print("⚠️ Continuing without database...")
 
 # 전역 스케줄러
 scheduler: Optional[CrawlerScheduler] = None
@@ -93,7 +99,11 @@ class LogResponse(BaseModel):
 @app.get("/")
 async def root():
     """루트 경로 - 헬스체크용"""
-    return {"message": "USC 수업 크롤러", "status": "running", "api": "/api"}
+    try:
+        return {"message": "USC 수업 크롤러", "status": "running", "api": "/api"}
+    except Exception as e:
+        print(f"Error in root endpoint: {e}")
+        return {"status": "error", "message": str(e)}
 
 @app.get("/api")
 async def api_root():
